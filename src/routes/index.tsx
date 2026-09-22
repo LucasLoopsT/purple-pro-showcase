@@ -1,5 +1,14 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { ArrowDown, ArrowUpRight, Download } from "lucide-react";
+import { ArrowDown, ArrowRight, ArrowUpRight, Download } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import portrait from "../assets/gabrielle-portrait.jpg";
 
 export const Route = createFileRoute("/")({
@@ -32,6 +41,8 @@ const experiences = [
     description:
       "Acompanho atendimentos ao lado da psicóloga clínica, prestando apoio a famílias e crianças em processo de adoção e auxiliando nas demandas do trabalho.",
     evidence: "escuta ativa, sigilo profissional e trabalho multidisciplinar",
+    tags: ["Escuta ativa", "Apoio a famílias", "Trabalho multidisciplinar", "Sigilo profissional"],
+    note: "Por se tratar de um contexto sensível, nenhuma informação de atendimento é divulgada aqui.",
   },
   {
     period: "DEZ/2024 — DEZ/2025",
@@ -40,6 +51,7 @@ const experiences = [
     description:
       "Atuei na oficina de Terapia Ocupacional, preparando e monitorando atividades com o método ABA, registrando atendimentos e apoiando o desenvolvimento das crianças.",
     evidence: "cuidado, observação e comunicação com crianças e famílias",
+    tags: ["Método ABA", "Terapia Ocupacional", "Desenvolvimento infantil", "Comunicação com famílias"],
   },
   {
     period: "OUT/2024 — DEZ/2024",
@@ -48,6 +60,7 @@ const experiences = [
     description:
       "Organizei prontuários, atas, agendamentos, arquivos no Drive e planilhas no Excel, além de apoiar a comunicação entre equipe, terapeutas e responsáveis.",
     evidence: "organização administrativa e comunicação entre diferentes públicos",
+    tags: ["Gestão de prontuários", "Organização administrativa", "Excel & Drive", "Comunicação"],
   },
   {
     period: "JUN/2023 — OUT/2024",
@@ -56,6 +69,56 @@ const experiences = [
     description:
       "Atendi clientes de diferentes perfis, organizei documentos, apoiei excursões e produzi conteúdo para as redes sociais da agência.",
     evidence: "clareza, agilidade e atenção em situações de alta demanda",
+    tags: ["Atendimento ao cliente", "Organização de documentos", "Excel", "Criação de conteúdo"],
+  },
+];
+
+const projects = [
+  {
+    id: "logistica-humanitaria",
+    eyebrow: "TCC · ETEC Cubatão · 2022",
+    title: "Projeto de Logística Humanitária",
+    summary:
+      "Ação social escolar que uniu planejamento, organização e responsabilidade social.",
+    fields: [
+      {
+        label: "Contexto",
+        text: "Trabalho de Conclusão de Curso do Técnico em Logística, desenvolvido como uma ação social escolar.",
+      },
+      {
+        label: "Objetivo",
+        text: "Proporcionar momentos de lazer e aprendizado, unindo planejamento, organização e responsabilidade social.",
+      },
+      {
+        label: "Entrega",
+        text: "Ação realizada com uma equipe de voluntários, beneficiando crianças da comunidade.",
+      },
+    ],
+    stats: [
+      { value: "260+", label: "crianças beneficiadas" },
+      { value: "20", label: "voluntários envolvidos" },
+    ],
+    tags: ["Planejamento", "Organização", "Responsabilidade social", "Logística aplicada"],
+    featured: true,
+  },
+  {
+    id: "representante-classe",
+    eyebrow: "Universidade · 2024",
+    title: "Representante de classe",
+    summary: "Mediação entre estudantes e professores, com organização de pautas e eventos acadêmicos.",
+    fields: [
+      {
+        label: "Contexto",
+        text: "Função exercida durante o quarto semestre do curso de Psicologia.",
+      },
+      {
+        label: "Atuação",
+        text: "Mediação de informações entre colegas e professores, organização de pautas e eventos acadêmicos e apoio na resolução de conflitos da turma.",
+      },
+    ],
+    stats: [],
+    tags: ["Comunicação", "Mediação", "Organização de eventos", "Relacionamento interpessoal"],
+    featured: false,
   },
 ];
 
@@ -144,28 +207,87 @@ function Portfolio() {
                 <h3 className="font-display text-2xl font-bold leading-tight">{item.company}</h3>
                 <p className="mt-1 text-sm font-semibold text-muted-foreground">{item.role}</p>
                 <p className="mt-4 max-w-[58ch] text-base leading-relaxed text-pretty sm:text-lg">{item.description}</p>
+                <div className="mt-5 flex flex-wrap gap-2">
+                  {item.tags.map((tag) => (
+                    <span key={tag} className="experience-tag">{tag}</span>
+                  ))}
+                </div>
                 <p className="mt-4 max-w-[58ch] text-sm leading-relaxed text-violet">
                   <strong className="font-semibold">Evidência — </strong>{item.evidence}
                 </p>
+                {item.note ? <p className="experience-note">{item.note}</p> : null}
               </article>
             ))}
           </div>
         </section>
 
         <section className="section-shell">
-          <p className="section-kicker">Iniciativa</p>
-          <h2 className="section-title">Além da rotina</h2>
-          <div className="divide-y divide-foreground/10 border-y border-foreground/10">
-            <article className="py-6">
-              <p className="font-mono text-[11px] uppercase text-violet">TCC · ETEC Cubatão · 2022</p>
-              <h3 className="mt-2 font-display text-xl font-bold">Projeto de Logística Humanitária</h3>
-              <p className="mt-2 leading-relaxed text-muted-foreground">Ação social escolar que uniu planejamento, organização e responsabilidade social, beneficiando mais de 260 crianças com o envolvimento de 20 voluntários.</p>
-            </article>
-            <article className="py-6">
-              <p className="font-mono text-[11px] uppercase text-violet">Universidade · 2024</p>
-              <h3 className="mt-2 font-display text-xl font-bold">Representante de classe</h3>
-              <p className="mt-2 leading-relaxed text-muted-foreground">Mediação entre estudantes e professores, com organização de pautas e eventos acadêmicos.</p>
-            </article>
+          <p className="section-kicker">Projetos</p>
+          <h2 className="section-title">Projetos &amp; atuações</h2>
+          <div className="projects-grid">
+            {projects.map((project) => (
+              <Dialog key={project.id}>
+                <DialogTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className={`project-card ${project.featured ? "project-card-featured" : ""}`}
+                    aria-label={`Ver detalhes de ${project.title}`}
+                  >
+                    <span className="project-media" aria-hidden="true">
+                      <span className="project-media-mark">GM</span>
+                      <span className="project-media-badge">Fotos em breve</span>
+                    </span>
+                    <span className="project-content">
+                      <span className="project-eyebrow">{project.eyebrow}</span>
+                      <span className="project-title">{project.title}</span>
+                      <span className="project-summary">{project.summary}</span>
+                      {project.stats.length > 0 ? (
+                        <span className="project-stats">
+                          {project.stats.map((stat) => (
+                            <span key={stat.label}><strong>{stat.value}</strong>{stat.label}</span>
+                          ))}
+                        </span>
+                      ) : null}
+                      <span className="project-more">Ver detalhes <ArrowRight aria-hidden="true" /></span>
+                    </span>
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-h-[88vh] max-w-2xl gap-0 overflow-y-auto border-border p-0 sm:rounded-lg">
+                  <div className="project-dialog-media">
+                    <span className="project-media-mark">GM</span>
+                    <span className="project-media-badge">Fotos em breve</span>
+                  </div>
+                  <div className="p-6 sm:p-8">
+                    <DialogHeader>
+                      <p className="project-eyebrow">{project.eyebrow}</p>
+                      <DialogTitle className="font-display text-2xl font-bold leading-tight sm:text-3xl">{project.title}</DialogTitle>
+                      <DialogDescription className="sr-only">Informações detalhadas sobre {project.title}</DialogDescription>
+                    </DialogHeader>
+                    <div className="mt-7 space-y-5">
+                      {project.fields.map((field) => (
+                        <div key={field.label}>
+                          <p className="dialog-field-label">{field.label}</p>
+                          <p className="leading-relaxed">{field.text}</p>
+                        </div>
+                      ))}
+                    </div>
+                    {project.stats.length > 0 ? (
+                      <div className="dialog-stats">
+                        {project.stats.map((stat) => (
+                          <div key={stat.label}><strong>{stat.value}</strong><span>{stat.label}</span></div>
+                        ))}
+                      </div>
+                    ) : null}
+                    <div className="mt-6">
+                      <p className="dialog-field-label">Competências</p>
+                      <div className="flex flex-wrap gap-2">
+                        {project.tags.map((tag) => <span key={tag} className="experience-tag">{tag}</span>)}
+                      </div>
+                    </div>
+                  </div>
+                </DialogContent>
+              </Dialog>
+            ))}
           </div>
         </section>
 
@@ -193,21 +315,28 @@ function Portfolio() {
 
         <section id="contato" className="section-shell scroll-mt-20">
           <p className="section-kicker">Contato</p>
-          <h2 className="section-title">Vamos conversar?</h2>
-          <p className="mb-7 max-w-[50ch] text-lg leading-relaxed">
-            Busco oportunidades de estágio em Recursos Humanos e Gestão de Pessoas. Será um prazer conversar sobre como posso contribuir com o seu time.
-          </p>
-          <div className="grid gap-3 text-base sm:text-lg">
-            <a className="contact-link" href="mailto:macedo.gabi06@gmail.com">
-              macedo.gabi06@gmail.com <ArrowUpRight aria-hidden="true" className="size-4" />
-            </a>
-            <a className="contact-link" href="https://www.linkedin.com/in/gabrielle-mac/" target="_blank" rel="noreferrer">
-              linkedin.com/in/gabrielle-mac <ArrowUpRight aria-hidden="true" className="size-4" />
-            </a>
-            <a className="contact-link" href="https://wa.me/5513988672420" target="_blank" rel="noreferrer">
-              (13) 98867-2420 <ArrowUpRight aria-hidden="true" className="size-4" />
-            </a>
-            <span className="mt-2 text-muted-foreground">Cubatão · SP</span>
+          <div className="contact-grid">
+            <div>
+              <h2 className="section-title italic">Vamos conversar?</h2>
+              <p className="max-w-[46ch] text-lg leading-relaxed text-muted-foreground">
+                Busco oportunidades de estágio em Recursos Humanos e Gestão de Pessoas. Será um prazer conversar sobre como posso contribuir com o seu time.
+              </p>
+              <p className="mt-5 text-sm text-muted-foreground">Cubatão · SP</p>
+            </div>
+            <div className="contact-list">
+              <a className="contact-row" href="mailto:macedo.gabi06@gmail.com">
+                <span><small>E-mail</small><strong>macedo.gabi06@gmail.com</strong></span>
+                <ArrowUpRight aria-hidden="true" />
+              </a>
+              <a className="contact-row" href="https://www.linkedin.com/in/gabrielle-mac/" target="_blank" rel="noreferrer">
+                <span><small>LinkedIn</small><strong>/in/gabrielle-mac</strong></span>
+                <ArrowUpRight aria-hidden="true" />
+              </a>
+              <a className="contact-row" href="https://wa.me/5513988672420" target="_blank" rel="noreferrer">
+                <span><small>WhatsApp</small><strong>(13) 98867-2420</strong></span>
+                <ArrowUpRight aria-hidden="true" />
+              </a>
+            </div>
           </div>
         </section>
       </main>
