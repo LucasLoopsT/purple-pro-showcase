@@ -1,5 +1,6 @@
+import * as React from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { ArrowDown, ArrowRight, ArrowUpRight, Download } from "lucide-react";
+import { ArrowDown, ArrowLeft, ArrowRight, ArrowUpRight, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -9,7 +10,16 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  type CarouselApi,
+} from "@/components/ui/carousel";
+import { ProjectCarousel, type ProjectImage } from "@/components/project-carousel";
 import portrait from "../assets/gabrielle-portrait.jpg";
+import tccPhoto from "../assets/TCC.jpg";
+import gabi from "../assets/gabi.jfif";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -51,7 +61,12 @@ const experiences = [
     description:
       "Atuei na oficina de Terapia Ocupacional, preparando e monitorando atividades com o método ABA, registrando atendimentos e apoiando o desenvolvimento das crianças.",
     evidence: "cuidado, observação e comunicação com crianças e famílias",
-    tags: ["Método ABA", "Terapia Ocupacional", "Desenvolvimento infantil", "Comunicação com famílias"],
+    tags: [
+      "Método ABA",
+      "Terapia Ocupacional",
+      "Desenvolvimento infantil",
+      "Comunicação com famílias",
+    ],
   },
   {
     period: "OUT/2024 — DEZ/2024",
@@ -73,13 +88,27 @@ const experiences = [
   },
 ];
 
-const projects = [
+const projects: {
+  id: string;
+  eyebrow: string;
+  title: string;
+  images: ProjectImage[];
+  summary: string;
+  fields: { label: string; text: string }[];
+  stats: { value: string; label: string }[];
+  tags: string[];
+  featured: boolean;
+}[] = [
   {
     id: "logistica-humanitaria",
     eyebrow: "TCC · ETEC Cubatão · 2022",
     title: "Projeto de Logística Humanitária",
-    summary:
-      "Ação social escolar que uniu planejamento, organização e responsabilidade social.",
+    images: [
+      { src: tccPhoto, alt: "Registro do Projeto de Logística Humanitária" },
+      { alt: "Mais fotos do projeto — em breve" },
+      { alt: "Mais fotos do projeto — em breve" },
+    ],
+    summary: "Ação social escolar que uniu planejamento, organização e responsabilidade social.",
     fields: [
       {
         label: "Contexto",
@@ -105,7 +134,9 @@ const projects = [
     id: "representante-classe",
     eyebrow: "Universidade · 2024",
     title: "Representante de classe",
-    summary: "Mediação entre estudantes e professores, com organização de pautas e eventos acadêmicos.",
+    images: [{ src: gabi, alt: "Foto de Gabrielle Macedo" }],
+    summary:
+      "Mediação entre estudantes e professores, com organização de pautas e eventos acadêmicos.",
     fields: [
       {
         label: "Contexto",
@@ -123,13 +154,31 @@ const projects = [
 ];
 
 const courses = [
-  "Psicologia Organizacional · Eskada / UEMA · 2026",
-  "ABA no TEA — Aplicador ABA · Instituto Neuro · 2024",
-  "Inglês avançado · Wizard by Pearson · 2018–2024",
-  "Pacote Office intermediário · ETEC Cubatão · 2020–2022",
+  { name: "Psicologia Organizacional", meta: "Eskada / UEMA · 2026" },
+  { name: "ABA no TEA — Aplicador ABA", meta: "Instituto Neuro · 2024" },
+  { name: "Inglês avançado", meta: "Wizard by Pearson · 2018–2024" },
+  { name: "Pacote Office intermediário", meta: "ETEC Cubatão · 2020–2022" },
 ];
 
 function Portfolio() {
+  const [projectsApi, setProjectsApi] = React.useState<CarouselApi>();
+  const [projectsSelected, setProjectsSelected] = React.useState(0);
+
+  React.useEffect(() => {
+    if (!projectsApi) return;
+
+    setProjectsSelected(projectsApi.selectedScrollSnap());
+    const onSelect = () => setProjectsSelected(projectsApi.selectedScrollSnap());
+
+    projectsApi.on("select", onSelect);
+    projectsApi.on("reInit", onSelect);
+
+    return () => {
+      projectsApi.off("select", onSelect);
+      projectsApi.off("reInit", onSelect);
+    };
+  }, [projectsApi]);
+
   return (
     <div className="min-h-screen bg-background text-foreground antialiased">
       <header className="sticky top-0 z-20 border-b border-foreground/10 bg-background/90 backdrop-blur-md">
@@ -192,7 +241,11 @@ function Portfolio() {
           <p className="section-kicker">Perfil</p>
           <h2 className="section-title">O que levo para o RH</h2>
           <p className="max-w-[58ch] text-lg leading-relaxed text-pretty">
-            Minha trajetória começou na Logística, onde aprendi a pensar em processos, planejamento e organização. Hoje, na Psicologia, amplio esse olhar com experiências reais de atendimento, rotina administrativa e apoio a famílias. Quero levar essa combinação para <strong className="font-semibold">Recursos Humanos e Gestão de Pessoas</strong>, com interesse em Recrutamento &amp; Seleção e desenvolvimento de pessoas.
+            Minha trajetória começou na Logística, onde aprendi a pensar em processos, planejamento
+            e organização. Hoje, na Psicologia, amplio esse olhar com experiências reais de
+            atendimento, rotina administrativa e apoio a famílias. Quero levar essa combinação para{" "}
+            <strong className="font-semibold">Recursos Humanos e Gestão de Pessoas</strong>, com
+            interesse em Recrutamento &amp; Seleção e desenvolvimento de pessoas.
           </p>
         </section>
 
@@ -201,115 +254,223 @@ function Portfolio() {
           <h2 className="section-title mb-10">Trajetória</h2>
           <div>
             {experiences.map((item) => (
-              <article key={`${item.period}-${item.company}`} className="relative border-l-2 border-lavender pb-14 pl-7 last:pb-2 sm:pl-8">
+              <article
+                key={`${item.period}-${item.company}`}
+                className="relative border-l-2 border-lavender pb-14 pl-7 last:pb-2 sm:pl-8"
+              >
                 <span className="absolute -left-[9px] top-1 size-4 rounded-full bg-violet ring-4 ring-background" />
-                <p className="mb-2 font-mono text-[11px] font-medium uppercase text-violet">{item.period}</p>
+                <p className="mb-2 font-mono text-[11px] font-medium uppercase text-violet">
+                  {item.period}
+                </p>
                 <h3 className="font-display text-2xl font-bold leading-tight">{item.company}</h3>
                 <p className="mt-1 text-sm font-semibold text-muted-foreground">{item.role}</p>
-                <p className="mt-4 max-w-[58ch] text-base leading-relaxed text-pretty sm:text-lg">{item.description}</p>
+                <p className="mt-4 max-w-[58ch] text-base leading-relaxed text-pretty sm:text-lg">
+                  {item.description}
+                </p>
                 <div className="mt-5 flex flex-wrap gap-2">
                   {item.tags.map((tag) => (
-                    <span key={tag} className="experience-tag">{tag}</span>
+                    <span key={tag} className="experience-tag">
+                      {tag}
+                    </span>
                   ))}
                 </div>
                 <p className="mt-4 max-w-[58ch] text-sm leading-relaxed text-violet">
-                  <strong className="font-semibold">Evidência — </strong>{item.evidence}
+                  <strong className="font-semibold">Evidência — </strong>
+                  {item.evidence}
                 </p>
-                {item.note ? <p className="experience-note">{item.note}</p> : null}
+                {/* {item.note ? <p className="experience-note">{item.note}</p> : null} */}
               </article>
             ))}
           </div>
         </section>
 
         <section className="section-shell">
-          <p className="section-kicker">Projetos</p>
-          <h2 className="section-title">Projetos &amp; atuações</h2>
-          <div className="projects-grid">
-            {projects.map((project) => (
-              <Dialog key={project.id}>
-                <DialogTrigger asChild>
-                  <Button
-                    variant="outline"
-                    className={`project-card ${project.featured ? "project-card-featured" : ""}`}
-                    aria-label={`Ver detalhes de ${project.title}`}
-                  >
-                    <span className="project-media" aria-hidden="true">
-                      <span className="project-media-mark">GM</span>
-                      <span className="project-media-badge">Fotos em breve</span>
-                    </span>
-                    <span className="project-content">
-                      <span className="project-eyebrow">{project.eyebrow}</span>
-                      <span className="project-title">{project.title}</span>
-                      <span className="project-summary">{project.summary}</span>
-                      {project.stats.length > 0 ? (
-                        <span className="project-stats">
-                          {project.stats.map((stat) => (
-                            <span key={stat.label}><strong>{stat.value}</strong>{stat.label}</span>
-                          ))}
-                        </span>
-                      ) : null}
-                      <span className="project-more">Ver detalhes <ArrowRight aria-hidden="true" /></span>
-                    </span>
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="max-h-[88vh] max-w-2xl gap-0 overflow-y-auto border-border p-0 sm:rounded-lg">
-                  <div className="project-dialog-media">
-                    <span className="project-media-mark">GM</span>
-                    <span className="project-media-badge">Fotos em breve</span>
-                  </div>
-                  <div className="p-6 sm:p-8">
-                    <DialogHeader>
-                      <p className="project-eyebrow">{project.eyebrow}</p>
-                      <DialogTitle className="font-display text-2xl font-bold leading-tight sm:text-3xl">{project.title}</DialogTitle>
-                      <DialogDescription className="sr-only">Informações detalhadas sobre {project.title}</DialogDescription>
-                    </DialogHeader>
-                    <div className="mt-7 space-y-5">
-                      {project.fields.map((field) => (
-                        <div key={field.label}>
-                          <p className="dialog-field-label">{field.label}</p>
-                          <p className="leading-relaxed">{field.text}</p>
-                        </div>
-                      ))}
-                    </div>
-                    {project.stats.length > 0 ? (
-                      <div className="dialog-stats">
-                        {project.stats.map((stat) => (
-                          <div key={stat.label}><strong>{stat.value}</strong><span>{stat.label}</span></div>
-                        ))}
-                      </div>
-                    ) : null}
-                    <div className="mt-6">
-                      <p className="dialog-field-label">Competências</p>
-                      <div className="flex flex-wrap gap-2">
-                        {project.tags.map((tag) => <span key={tag} className="experience-tag">{tag}</span>)}
-                      </div>
-                    </div>
-                  </div>
-                </DialogContent>
-              </Dialog>
-            ))}
-          </div>
-        </section>
-
-        <section className="section-shell">
-          <p className="section-kicker">Formação</p>
-          <h2 className="section-title">Aprendizado contínuo</h2>
+          <p className="section-kicker">Vida Acadêmica</p>
+          <h2 className="section-title">Formações</h2>
           <div className="space-y-7">
             <div>
               <p className="font-display text-xl font-bold">Bacharelado em Psicologia</p>
-              <p className="mt-1 text-muted-foreground">Universidade Católica de Santos · 2023–2027 · Em andamento</p>
+              <p className="mt-1 text-muted-foreground">
+                Universidade Católica de Santos · 2023–2027 · Em andamento
+              </p>
             </div>
             <div>
               <p className="font-display text-xl font-bold">Técnico em Logística</p>
-              <p className="mt-1 text-muted-foreground">ETEC Cubatão · Ensino Médio Integrado · 2020–2022</p>
+              <p className="mt-1 text-muted-foreground">
+                ETEC Cubatão · Ensino Médio Integrado · 2020–2022
+              </p>
             </div>
-            <ul className="border-t border-foreground/10 pt-3">
-              {courses.map((course) => (
-                <li key={course} className="border-b border-foreground/10 py-3 text-sm leading-relaxed text-muted-foreground">
-                  {course}
-                </li>
-              ))}
-            </ul>
+            <div>
+              <p className="courses-kicker">Cursos complementares</p>
+              <ul className="courses-list">
+                {courses.map((course) => (
+                  <li key={course.name} className="courses-list-item">
+                    <span className="courses-list-name">{course.name}</span>
+                    <span className="courses-list-meta">{course.meta}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <section id="projetos" className="section-shell">
+          <div className="wrap">
+            <div className="section-head reveal">
+              <p className="section-kicker">Atividades</p>
+              <h2 className="section-title mb-10">Projetos &amp; Atuações</h2>
+            </div>
+
+            <div className="projects-carousel-wrap reveal">
+              <Carousel
+                setApi={setProjectsApi}
+                opts={{ align: "start", loop: projects.length > 1 }}
+              >
+                <CarouselContent className="ml-0">
+                  {projects.map((project) => (
+                    <CarouselItem key={project.id} className="pl-0">
+                      <Dialog>
+                        <DialogTrigger asChild>
+                          <button
+                            type="button"
+                            className="project-card"
+                            aria-label={`Ver detalhes de ${project.title}`}
+                          >
+                            <div className="project-media">
+                              {project.images[0]?.src ? (
+                                <img
+                                  src={project.images[0].src}
+                                  alt={project.title}
+                                  className="w-full h-full object-cover object-center"
+                                />
+                              ) : (
+                                <div className="project-carousel-placeholder h-full w-full">
+                                  <span className="project-media-badge">Foto em breve</span>
+                                </div>
+                              )}
+                            </div>
+
+                            <div className="project-content">
+                              <p className="project-eyebrow">{project.eyebrow}</p>
+
+                              <h3 className="project-title">{project.title}</h3>
+
+                              <p className="project-summary">{project.summary}</p>
+
+                              <div className="project-stats">
+                                {project.stats.map((stat) => (
+                                  <div
+                                    key={stat.label}
+                                    className="flex flex-col items-start justify-start"
+                                  >
+                                    <strong>{stat.value}</strong>
+                                    {stat.label}
+                                  </div>
+                                ))}
+                              </div>
+
+                              <span className="project-more">
+                                Ver detalhes
+                                <ArrowRight aria-hidden="true" />
+                              </span>
+                            </div>
+                          </button>
+                        </DialogTrigger>
+
+                        <DialogContent className="flex max-h-[88vh] max-w-2xl flex-col gap-0 overflow-hidden border-border p-0 sm:rounded-lg">
+                          <div className="project-dialog-media aspect-[16/10] w-full">
+                            <ProjectCarousel images={project.images} />
+                          </div>
+
+                          <div className="overflow-y-auto p-6 sm:p-8">
+                            <DialogHeader>
+                              <p className="project-eyebrow">{project.eyebrow}</p>
+
+                              <DialogTitle className="font-display text-2xl font-bold leading-tight sm:text-3xl">
+                                {project.title}
+                              </DialogTitle>
+
+                              <DialogDescription className="sr-only">
+                                Informações detalhadas sobre {project.title}
+                              </DialogDescription>
+                            </DialogHeader>
+
+                            <div className="mt-7 space-y-5">
+                              {project.fields.map((field) => (
+                                <div key={field.label}>
+                                  <p className="dialog-field-label">{field.label}</p>
+
+                                  <p className="leading-relaxed">{field.text}</p>
+                                </div>
+                              ))}
+                            </div>
+
+                            {project.stats.length > 0 && (
+                              <div className="dialog-stats">
+                                {project.stats.map((stat) => (
+                                  <div key={stat.label}>
+                                    <strong>{stat.value}</strong>
+                                    <span>{stat.label}</span>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+
+                            <div className="mt-6">
+                              <p className="dialog-field-label">Competências</p>
+
+                              <div className="flex flex-wrap gap-2">
+                                {project.tags.map((tag) => (
+                                  <span key={tag} className="experience-tag">
+                                    {tag}
+                                  </span>
+                                ))}
+                              </div>
+                            </div>
+                          </div>
+                        </DialogContent>
+                      </Dialog>
+                    </CarouselItem>
+                  ))}
+                </CarouselContent>
+              </Carousel>
+
+              {projects.length > 1 && (
+                <div className="projects-carousel-controls">
+                  <button
+                    type="button"
+                    className="project-carousel-arrow-style projects-carousel-nav-btn"
+                    aria-label="Projeto anterior"
+                    onClick={() => projectsApi?.scrollPrev()}
+                  >
+                    <ArrowLeft aria-hidden="true" className="size-4" />
+                  </button>
+
+                  <div className="projects-carousel-dots" role="tablist" aria-label="Projetos">
+                    {projects.map((project, index) => (
+                      <button
+                        key={project.id}
+                        type="button"
+                        role="tab"
+                        aria-selected={index === projectsSelected}
+                        aria-label={`Ver projeto ${index + 1}: ${project.title}`}
+                        className={`project-carousel-dot ${index === projectsSelected ? "is-active" : ""}`}
+                        onClick={() => projectsApi?.scrollTo(index)}
+                      />
+                    ))}
+                  </div>
+
+                  <button
+                    type="button"
+                    className="project-carousel-arrow-style projects-carousel-nav-btn"
+                    aria-label="Próximo projeto"
+                    onClick={() => projectsApi?.scrollNext()}
+                  >
+                    <ArrowRight aria-hidden="true" className="size-4" />
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         </section>
 
@@ -319,21 +480,41 @@ function Portfolio() {
             <div>
               <h2 className="section-title italic">Vamos conversar?</h2>
               <p className="max-w-[46ch] text-lg leading-relaxed text-muted-foreground">
-                Busco oportunidades de estágio em Recursos Humanos e Gestão de Pessoas. Será um prazer conversar sobre como posso contribuir com o seu time.
+                Busco oportunidades de estágio em Recursos Humanos e Gestão de Pessoas. Será um
+                prazer conversar sobre como posso contribuir com o seu time.
               </p>
               <p className="mt-5 text-sm text-muted-foreground">Cubatão · SP</p>
             </div>
             <div className="contact-list">
               <a className="contact-row" href="mailto:macedo.gabi06@gmail.com">
-                <span><small>E-mail</small><strong>macedo.gabi06@gmail.com</strong></span>
+                <span>
+                  <small>E-mail</small>
+                  <strong>macedo.gabi06@gmail.com</strong>
+                </span>
                 <ArrowUpRight aria-hidden="true" />
               </a>
-              <a className="contact-row" href="https://www.linkedin.com/in/gabrielle-mac/" target="_blank" rel="noreferrer">
-                <span><small>LinkedIn</small><strong>/in/gabrielle-mac</strong></span>
+              <a
+                className="contact-row"
+                href="https://www.linkedin.com/in/gabrielle-mac/"
+                target="_blank"
+                rel="noreferrer"
+              >
+                <span>
+                  <small>LinkedIn</small>
+                  <strong>/in/gabrielle-mac</strong>
+                </span>
                 <ArrowUpRight aria-hidden="true" />
               </a>
-              <a className="contact-row" href="https://wa.me/5513988672420" target="_blank" rel="noreferrer">
-                <span><small>WhatsApp</small><strong>(13) 98867-2420</strong></span>
+              <a
+                className="contact-row"
+                href="https://wa.me/5513988672420"
+                target="_blank"
+                rel="noreferrer"
+              >
+                <span>
+                  <small>WhatsApp</small>
+                  <strong>(13) 98867-2420</strong>
+                </span>
                 <ArrowUpRight aria-hidden="true" />
               </a>
             </div>
@@ -342,7 +523,9 @@ function Portfolio() {
       </main>
 
       <footer className="mx-auto max-w-3xl border-t border-foreground/10 px-5 py-8 sm:px-6">
-        <p className="font-mono text-[11px] font-medium uppercase text-violet">Gabrielle Macedo · Psicologia · 2026</p>
+        <p className="font-mono text-[11px] font-medium uppercase text-violet">
+          Gabrielle Macedo · Psicologia · 2026
+        </p>
       </footer>
     </div>
   );
